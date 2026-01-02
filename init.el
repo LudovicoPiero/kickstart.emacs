@@ -48,11 +48,11 @@
   (blink-cursor-mode nil)     ;; Don't blink cursor
   (global-auto-revert-mode t) ;; Automatically reload file and show changes if the file has changed
 
-  ;;(dired-kill-when-opening-new-dired-buffer t) ;; Dired don't create new buffer
+  (dired-kill-when-opening-new-dired-buffer t) ;; Dired don't create new buffer
   ;;(recentf-mode t) ;; Enable recent file mode
 
-  ;;(global-visual-line-mode t)           ;; Enable truncated lines
-  ;;(display-line-numbers-type 'relative) ;; Relative line numbers
+  (global-visual-line-mode t)           ;; Enable truncated lines
+  (display-line-numbers-type 'relative) ;; Relative line numbers
   (global-display-line-numbers-mode t)  ;; Display line numbers
 
   (mouse-wheel-progressive-speed nil) ;; Disable progressive speed when scrolling
@@ -78,6 +78,28 @@
          ("<C-wheel-down>" . text-scale-decrease)
          )
   )
+
+(use-package evil
+  :init
+  (evil-mode)
+  :config
+  (evil-set-initial-state 'eat-mode 'insert) ;; Set initial state in eat terminal to insert mode
+  :custom
+  (evil-want-keybinding nil)    ;; Disable evil bindings in other modes (It's not consistent and not good)
+  (evil-want-C-u-scroll t)      ;; Set C-u to scroll up
+  (evil-want-C-i-jump nil)      ;; Disables C-i jump
+  (evil-undo-system 'undo-redo) ;; C-r to redo
+  ;; Unmap keys in 'evil-maps. If not done, org-return-follows-link will not work
+  :bind (:map evil-motion-state-map
+              ("SPC" . nil)
+              ("RET" . nil)
+              ("TAB" . nil)))
+(use-package evil-collection
+  :after evil
+  :config
+  ;; Setting where to use evil-collection
+  (setq evil-collection-mode-list '(dired ibuffer magit corfu vertico consult info))
+  (evil-collection-init))
 
 (use-package general
   :config
@@ -164,14 +186,14 @@
 (add-to-list 'default-frame-alist '(alpha-background . 90)) ;; For all new frames henceforth
 
 (set-face-attribute 'default nil
-                    ;; :font "JetBrains Mono" ;; Set your favorite type of font or download JetBrains Mono
+                    :font "Iosevka"
                     :height 120
                     :weight 'medium)
 ;; This sets the default font on all graphical frames created after restarting Emacs.
 ;; Does the same thing as 'set-face-attribute default' above, but emacsclient fonts
 ;; are not right unless I also add this method of setting the default font.
 
-;;(add-to-list 'default-frame-alist '(font . "JetBrains Mono")) ;; Set your favorite font
+(add-to-list 'default-frame-alist '(font . "Iosevka")) ;; Set your favorite font
 (setq-default line-spacing 0.12)
 
 (use-package doom-modeline
@@ -195,7 +217,7 @@
   ;; (projectile-auto-discover nil) ;; Disable auto search for better startup times ;; Search with a keybind
   (projectile-run-use-comint-mode t) ;; Interactive run dialog when running projects inside emacs (like giving input)
   (projectile-switch-project-action #'projectile-dired) ;; Open dired when switching to a project
-  (projectile-project-search-path '("~/projects/" "~/work/" ("~/github" . 1)))) ;; . 1 means only search the first subdirectory level for projects
+  (projectile-project-search-path '("~/Code/" "~/work/" ("~/github" . 1)))) ;; . 1 means only search the first subdirectory level for projects
 
 (use-package eglot
   :ensure nil ;; Don't install eglot because it's now built-in
@@ -221,6 +243,9 @@
 
 (use-package yasnippet-snippets
   :hook (prog-mode . yas-minor-mode))
+
+(use-package lua-mode
+  :mode "\\.lua\\'") ;; Only start in a lua file
 
 (use-package org
   :ensure nil
